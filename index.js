@@ -5,6 +5,10 @@ const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const app = express();
 const port = process.env.PORT || 5000;
 
+// middleware
+app.use(cors());
+app.use(express.json());
+
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.vnidizo.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 
 const client = new MongoClient(uri, {
@@ -18,6 +22,21 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     await client.connect();
+    const artCollection = client.db("artDB").collection("art");
+
+    app.get("/art", async (req, res) => {
+      const cursor = artCollection.find();
+      const result = await cursor.toArray();
+      res.send(result);
+    });
+
+    app.post("/art", async (req, res) => {
+      const newArt = req.body;
+      console.log(newArt);
+      const result = await artCollection.insertOne(newArt);
+      res.send(result);
+    });
+
     await client.db("admin").command({ ping: 1 });
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!"
