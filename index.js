@@ -30,6 +30,21 @@ async function run() {
       res.send(result);
     });
 
+    app.get("/art/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const user = await artCollection.findOne(query);
+      res.send(user);
+    });
+
+    app.get("/myartlist/:email", async (req, res) => {
+      console.log(req.params.email);
+      const result = await artCollection
+        .find({ email: req.params.email })
+        .toArray();
+      res.send(result);
+    });
+
     app.post("/art", async (req, res) => {
       const newArt = req.body;
       console.log(newArt);
